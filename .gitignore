@@ -1,0 +1,57 @@
+# ESP-IDF build output
+*/build/
+/sdkconfig.old
+/sdkconfig
+
+# Python virtual environment (if created inside project)
+.env/
+.venv/
+.python_env/
+
+# ESP-IDF specific
+*.bin
+*.elf
+*.map
+*.exe
+
+# # CMake specific
+# CMakeFiles/
+# CMakeCache.txt
+# cmake_install.cmake
+# *.cmake
+
+# Ninja build system files
+/.ninja_deps
+/.ninja_log
+
+# ESP-IDF tools and artifacts
+/.espressif/
+
+# Log files
+*.log
+
+# Core dumps
+core
+
+# Backup files
+*~
+*.bak
+
+# VSCode settings (if you're using it)
+.vscode/
+
+# CLion/JetBrains IDE settings
+.idea/
+
+# Mac OS metadata
+.DS_Store
+
+# Python bytecode
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+
+# GDB configuration or session files
+.gdb_history
+.gdbinit
