@@ -60,6 +60,8 @@ static void wifi_init_sta(void)
     esp_netif_create_default_wifi_sta();
 
     wifi_init_config_t cfg = WIFI_INIT_CONFIG_DEFAULT();
+    cfg.static_tx_buf_num = 4;
+    cfg.dynamic_tx_buf_num = 8;
     ESP_ERROR_CHECK( esp_wifi_init(&cfg) );
     ESP_ERROR_CHECK( esp_event_handler_instance_register(WIFI_EVENT,
                                                         ESP_EVENT_ANY_ID,
@@ -76,7 +78,7 @@ static void wifi_init_sta(void)
         .sta = {
             .ssid = WIFI_SSID,
             .password = WIFI_PASS,
-            .threshold.authmode = WIFI_AUTH_WPA2_PSK,
+            //.threshold.authmode = WIFI_AUTH_WPA2_PSK,
             //.threshold.authmode = WIFI_AUTH_OPEN  // No password
         },
     };
@@ -89,17 +91,8 @@ static void wifi_init_sta(void)
 
 void app_main(void)
 {
-    // NVS flash 
-    esp_err_t ret = nvs_flash_init();
-    if (ret == ESP_ERR_NVS_NO_FREE_PAGES ||
-        ret == ESP_ERR_NVS_NEW_VERSION_FOUND) {
-        ESP_ERROR_CHECK( nvs_flash_erase() );
-        ret = nvs_flash_init();
-    }
-    ESP_ERROR_CHECK(ret);
-
-    wifi_init_sta();
-
+    ESP_LOGI(TAG, "Free PSRAM: %d, Largest block: %d", 
+        heap_caps_get_free_size(MALLOC_CAP_SPIRAM), heap_caps_get_largest_free_block(MALLOC_CAP_SPIRAM));
     // Configure camera
     static camera_config_t config = {
         .pin_pwdn       = CAM_PIN_PWDN,
@@ -124,20 +117,33 @@ void app_main(void)
         .ledc_channel = LEDC_CHANNEL_0,
     
         .pixel_format = PIXFORMAT_JPEG,//YUV422,GRAYSCALE,RGB565,JPEG
-        .frame_size = FRAMESIZE_UXGA,//QQVGA-UXGA, For ESP32, do not use sizes above QVGA when not JPEG. The performance of the ESP32-S series has improved a lot, but JPEG mode always gives better frame rates.
+        .frame_size = FRAMESIZE_QVGA,
     
-        .jpeg_quality = 12, //0-63, for OV series camera sensors, lower number means higher quality
+        .jpeg_quality = 63, //0-63, for OV series camera sensors, lower number means higher quality
         .fb_count = 1, //When jpeg mode is used, if fb_count more than one, the driver will work in continuous mode.
         .grab_mode      = CAMERA_GRAB_WHEN_EMPTY,
-        .fb_location    = CAMERA_FB_IN_PSRAM
+        //.fb_location    = CAMERA_FB_IN_PSRAM
+        .fb_location = CAMERA_FB_IN_DRAM
     };
-    
+
     // init camera
-    ret = esp_camera_init(&config);
+    esp_err_t ret = esp_camera_init(&config);
     if (ret != ESP_OK) {
         ESP_LOGE(TAG, "Camera init failed (%x)", ret);
         return;
     }
+
+    // NVS flash 
+    ret = nvs_flash_init();
+    if (ret == ESP_ERR_NVS_NO_FREE_PAGES ||
+        ret == ESP_ERR_NVS_NEW_VERSION_FOUND) {
+        ESP_ERROR_CHECK( nvs_flash_erase() );
+        ret = nvs_flash_init();
+    }
+    ESP_ERROR_CHECK(ret);
+
+    // init wifi after camera to give more memory PSRAM to camera
+    wifi_init_sta();
 
     sensor_t *s = esp_camera_sensor_get();
     if (s->id.PID == OV3660_PID) {
@@ -167,7 +173,7 @@ void app_main(void)
     // start HTTP camera server task
     start_camera_server();
 
-    ESP_LOGI(TAG, "Camera Ready! Connect to http://<this-board-IP>/");
+    ESP_LOGI(TAG, "Camera Ready!");
 
     vTaskDelete(NULL);
 }

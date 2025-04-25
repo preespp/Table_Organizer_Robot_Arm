@@ -9,7 +9,9 @@ static esp_err_t jpg_stream_handler(httpd_req_t *req) {
     camera_fb_t *fb = NULL;
     esp_err_t res = ESP_OK;
     char *part_buf[64];
-    
+
+    ESP_LOGI(TAG, "Stream request started");
+
     // Set HTTP headers for multipart JPEG stream
     httpd_resp_set_type(req, "multipart/x-mixed-replace; boundary=1234567890");
 
@@ -21,34 +23,57 @@ static esp_err_t jpg_stream_handler(httpd_req_t *req) {
             break;
         }
 
+        ESP_LOGI(TAG, "Captured frame: %u bytes", fb->len);
+
         // Send multipart boundary
         res = httpd_resp_send_chunk(req, "--1234567890\r\n", strlen("--1234567890\r\n"));
-        if (res != ESP_OK) break;
+        if (res != ESP_OK) {
+            ESP_LOGE(TAG, "Failed to send boundary");
+            break;
+        }
 
         // Send content headers
-        snprintf((char *)part_buf, sizeof(part_buf),
+        int header_len = snprintf((char *)part_buf, sizeof(part_buf),
                  "Content-Type: image/jpeg\r\nContent-Length: %u\r\n\r\n",
                  fb->len);
-        res = httpd_resp_send_chunk(req, (const char *)part_buf, strlen((const char *)part_buf));
-        if (res != ESP_OK) break;
+        res = httpd_resp_send_chunk(req, (const char *)part_buf, header_len);
+        if (res != ESP_OK) {
+            ESP_LOGE(TAG, "Failed to send headers");
+            break;
+        }
 
         // Send JPEG image
         res = httpd_resp_send_chunk(req, (const char *)fb->buf, fb->len);
-        if (res != ESP_OK) break;
+        if (res != ESP_OK) {
+            ESP_LOGE(TAG, "Failed to send JPEG frame");
+            break;
+        }
 
         // Send line break
         res = httpd_resp_send_chunk(req, "\r\n", strlen("\r\n"));
-        if (res != ESP_OK) break;
+        if (res != ESP_OK) {
+            ESP_LOGE(TAG, "Failed to send line break");
+            break;
+        }
 
         esp_camera_fb_return(fb);
-        vTaskDelay(30 / portTICK_PERIOD_MS); // ~30 FPS
+        fb = NULL;
+
+        // **Lower FPS to reduce bandwidth**
+        vTaskDelay(200 / portTICK_PERIOD_MS); // ~5 FPS
     }
 
-    esp_camera_fb_return(fb);
+    if (fb) {
+        esp_camera_fb_return(fb);
+    }
+
+    ESP_LOGI(TAG, "Stream request ended");
     return res;
 }
 
 static esp_err_t jpg_capture_handler(httpd_req_t *req) {
+    ESP_LOGI(TAG, "Capture request started");
+
     camera_fb_t *fb = esp_camera_fb_get();
     if (!fb) {
         ESP_LOGE(TAG, "Camera capture failed");
@@ -56,15 +81,20 @@ static esp_err_t jpg_capture_handler(httpd_req_t *req) {
         return ESP_FAIL;
     }
 
+    ESP_LOGI(TAG, "Captured frame: %u bytes", fb->len);
+
     httpd_resp_set_type(req, "image/jpeg");
-    httpd_resp_send(req, (const char *)fb->buf, fb->len);
+    esp_err_t res = httpd_resp_send(req, (const char *)fb->buf, fb->len);
     esp_camera_fb_return(fb);
-    return ESP_OK;
+
+    ESP_LOGI(TAG, "Capture request ended");
+    return res;
 }
 
 void start_camera_server() {
     httpd_config_t config = HTTPD_DEFAULT_CONFIG();
     config.server_port = 80;
+    config.stack_size = 8192;  // **Increase HTTPD stack size if needed**
 
     httpd_handle_t server = NULL;
     if (httpd_start(&server, &config) == ESP_OK) {
