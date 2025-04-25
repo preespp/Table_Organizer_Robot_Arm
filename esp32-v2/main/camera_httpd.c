@@ -6,7 +6,9 @@
 #include <arpa/inet.h>  // For htonl
 
 #define SERVER_IP   "192.168.8.106"  // Replace with your PC IP
-#define SERVER_PORT 8080
+// #define SERVER_PORT 8080
+#define SERVER_PORT 505 // UDP
+#define CHUNK       1024   
 
 static const char* TAG = "camera_httpd";
 
@@ -101,43 +103,95 @@ static esp_err_t jpg_capture_handler(httpd_req_t *req) {
     return res;
 }
 
-void tcp_send_frame(camera_fb_t *fb) {
-    int sock = socket(AF_INET, SOCK_STREAM, IPPROTO_IP);
-    if (sock < 0) {
-        ESP_LOGE("TCP", "Unable to create socket");
-        return;
-    }
+static uint16_t frame_id = 0;
 
-    struct sockaddr_in dest_addr = {
+void udp_send_frame(const camera_fb_t *fb)
+{
+    int sock = socket(AF_INET, SOCK_DGRAM, IPPROTO_IP);
+    if (sock < 0) { ESP_LOGE("UDP", "socket() fail"); return; }
+
+    struct sockaddr_in dst = {
         .sin_family = AF_INET,
-        .sin_port = htons(SERVER_PORT),
+        .sin_port   = htons(SERVER_PORT),
         .sin_addr.s_addr = inet_addr(SERVER_IP),
     };
 
-    if (connect(sock, (struct sockaddr *)&dest_addr, sizeof(dest_addr)) != 0) {
-        ESP_LOGE("TCP", "Socket connection failed");
+    uint16_t total_pkts = (fb->len + CHUNK - 1) / CHUNK;
+    const uint8_t *p    = fb->buf;
+
+    for (uint16_t pkt = 0; pkt < total_pkts; ++pkt) {
+        uint16_t bytes = (fb->len - pkt * CHUNK > CHUNK) ? CHUNK
+                                                         : (fb->len - pkt * CHUNK);
+
+        uint8_t buf[8 + CHUNK];              // header + payload
+        /* pack header (little endian OK on both sides in this small demo) */
+        ((uint16_t*)buf)[0] = frame_id;
+        ((uint16_t*)buf)[1] = pkt;
+        ((uint16_t*)buf)[2] = total_pkts;
+        ((uint16_t*)buf)[3] = bytes;
+
+        memcpy(buf + 8, p, bytes);
+        p += bytes;
+
+        sendto(sock, buf, bytes + 8, 0,
+               (struct sockaddr *)&dst, sizeof(dst));
+    }
+
+    ESP_LOGI("UDP", "sent frame %u in %u packets, %u bytes",
+             frame_id, total_pkts, fb->len);
+    frame_id++;                              // roll over automatically
+    close(sock);
+}
+
+void tcp_send_frame(camera_fb_t *fb)
+{
+    /* ---- open socket ---- */
+    int sock = socket(AF_INET, SOCK_STREAM, IPPROTO_IP);
+    if (sock < 0) {
+        ESP_LOGE("TCP", "socket() failed");
+        return;
+    }
+
+    struct sockaddr_in dest = {
+        .sin_family      = AF_INET,
+        .sin_port        = htons(SERVER_PORT),
+        .sin_addr.s_addr = inet_addr(SERVER_IP)
+    };
+
+    if (connect(sock, (struct sockaddr *)&dest, sizeof(dest)) != 0) {
+        ESP_LOGE("TCP", "connect() failed");
         close(sock);
         return;
     }
 
-    uint32_t frame_size_net = htonl(fb->len);
-    if (send(sock, &frame_size_net, sizeof(frame_size_net), 0) != sizeof(frame_size_net)) {
-        ESP_LOGE("TCP", "Failed to send frame size");
+    /* ---- Step 1: send the length ---- */
+    uint32_t len_net = htonl(fb->len);          // host→network order
+    if (send(sock, &len_net, sizeof(len_net), 0) != sizeof(len_net)) {
+        ESP_LOGE("TCP", "couldn’t send length");
         close(sock);
         return;
     }
 
-    size_t total_sent = 0;
-    while (total_sent < fb->len) {
-        int sent_now = send(sock, fb->buf + total_sent, fb->len - total_sent, 0);
-        if (sent_now < 0) {
-            ESP_LOGE("TCP", "Failed to send frame data");
+    /* ---- Step 2: wait for 1-byte ACK ('O') ---- */
+    char ack = 0;
+    if (recv(sock, &ack, 1, MSG_WAITALL) != 1 || ack != 'O') {
+        ESP_LOGE("TCP", "no ACK from PC");
+        close(sock);
+        return;
+    }
+
+    /* ---- Step 3: stream the JPEG buffer ---- */
+    size_t sent = 0;
+    while (sent < fb->len) {
+        int ret = send(sock, fb->buf + sent, fb->len - sent, 0);
+        if (ret < 0) {
+            ESP_LOGE("TCP", "send() interrupted");
             break;
         }
-        total_sent += sent_now;
+        sent += ret;
     }
 
-    ESP_LOGI("TCP", "Frame sent: %u bytes", fb->len);
+    ESP_LOGI("TCP", "Frame sent OK: %u bytes", fb->len);
     close(sock);
 }
 
@@ -150,7 +204,8 @@ void capture_and_send_task(void *pvParameters) {
             continue;
         }
 
-        tcp_send_frame(fb);
+        //tcp_send_frame(fb);
+        udp_send_frame(fb);
         esp_camera_fb_return(fb);
 
         vTaskDelay(2000 / portTICK_PERIOD_MS);  // Capture every 2 seconds
