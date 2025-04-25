@@ -1,63 +1,44 @@
-#include "yolo_task.h"
-#include "camera_task.h"
+#include "cv_task.h"
+#include "esp_dl.h"
 #include "esp_log.h"
-#include "dl_image_proc.h"     // For fmt2rgb888, resize
-#include "esp_dl.h"            // For esp_dl_detect_run()
-#include "freertos/queue.h"
 
-#define TAG "YOLO"
+static const char *TAG = "YOLO_MODEL";
 #define YOLO_INPUT_WIDTH 128
 #define YOLO_INPUT_HEIGHT 128
 
-extern QueueHandle_t bbox_queue;
-
 extern const uint8_t yolo_model_bin_start[] asm("_binary_yolo_model_bin_start");
-extern const uint8_t yolo_model_bin_end[]   asm("_binary_yolo_model_bin_end");
+extern const uint8_t yolo_model_bin_end[] asm("_binary_yolo_model_bin_end");
 
-void *yolo_handle = esp_dl_model_init(yolo_model_bin_start, yolo_model_bin_end - yolo_model_bin_start);
+static void *yolo_handle = NULL;
 
-void yolo_task(void *pvParameters) {
-
-    // Load YOLO model (once)
+void yolo_init() {
     yolo_handle = esp_dl_model_init(yolo_model_bin_start, yolo_model_bin_end - yolo_model_bin_start);
-
     if (!yolo_handle) {
-        ESP_LOGE(TAG, "Failed to load YOLO model");
-        vTaskDelete(NULL);
+        ESP_LOGE(TAG, "Failed to load YOLO model.");
+    } else {
+        ESP_LOGI(TAG, "YOLO model loaded successfully.");
+    }
+}
+
+int run_yolo(const uint8_t *image_rgb888, yolo_result_t *results) {
+    if (!yolo_handle) {
+        ESP_LOGE(TAG, "YOLO model not initialized.");
+        return 0;
     }
 
-    while (1) {
-        camera_fb_t *fb = camera_capture();
-        if (!fb) {
-            vTaskDelay(pdMS_TO_TICKS(100));
-            continue;
-        }
+    esp_dl_detect_output_t output;
+    esp_dl_detect_run(yolo_handle, image_rgb888, &output);
 
-        // Convert JPEG to RGB888
-        dl_matrix3du_t *image_rgb = dl_matrix3du_alloc(1, fb->width, fb->height, 3);
-        if (!fmt2rgb888(fb->buf, fb->len, fb->format, image_rgb->item)) {
-            ESP_LOGE(TAG, "JPEG to RGB888 conversion failed");
-            esp_camera_fb_return(fb);
-            continue;
-        }
-        esp_camera_fb_return(fb);
+    int num_objects = output.num_box;
+    if (num_objects > MAX_YOLO_RESULTS) num_objects = MAX_YOLO_RESULTS;
 
-        // Resize image to YOLO input
-        dl_matrix3du_t *input_resized = dl_matrix3du_alloc(1, YOLO_INPUT_WIDTH, YOLO_INPUT_HEIGHT, 3);
-        image_resize_linear(input_resized->item, YOLO_INPUT_WIDTH, YOLO_INPUT_HEIGHT,
-                            image_rgb->item, fb->width, fb->height, 3);
-        dl_matrix3du_free(image_rgb);
-
-        // Run YOLO (pseudo)
-        esp_dl_detect_output_t output;
-        esp_dl_detect_run(yolo_handle, input_resized->item, &output);
-
-        // Send dummy bbox to next task
-        BBoxMsg bbox = {100.0f, 50.0f, 200.0f, 150.0f};
-        xQueueSend(bbox_queue, &bbox, portMAX_DELAY);
-
-        dl_matrix3du_free(input_resized);
-
-        vTaskDelay(pdMS_TO_TICKS(500));  // Adjust as needed
+    for (int i = 0; i < num_objects; i++) {
+        results[i].x = output.box[i].box[0];
+        results[i].y = output.box[i].box[1];
+        results[i].width = output.box[i].box[2] - output.box[i].box[0];
+        results[i].height = output.box[i].box[3] - output.box[i].box[1];
     }
+
+    ESP_LOGI(TAG, "YOLO detected %d objects.", num_objects);
+    return num_objects;
 }

@@ -1,16 +1,19 @@
-#ifndef YOLO_TASK_H
-#define YOLO_TASK_H
-#include "freertos/FreeRTOS.h"
-#include "freertos/task.h"
-#include "freertos/queue.h"
-#include "camera_task.h"
+#ifndef YOLO_MODEL_H
+#define YOLO_MODEL_H
 
-extern QueueHandle_t bbox_queue;
+#include <stdint.h>
+#include <stddef.h>
 
 typedef struct {
-    float x, y, width, height;
-} BBoxMsg;
+    int x;
+    int y;
+    int width;
+    int height;
+} yolo_result_t;
 
-void yolo_task(void *pvParameters);
+#define MAX_YOLO_RESULTS 10
+
+void yolo_init();
+int run_yolo(const uint8_t *image_rgb888, yolo_result_t *results);
 
 #endif

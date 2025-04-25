@@ -6,8 +6,8 @@
 #include <arpa/inet.h>  // For htonl
 
 #define SERVER_IP   "192.168.8.106"  // Replace with your PC IP
-// #define SERVER_PORT 8080
-#define SERVER_PORT 505 // UDP
+// #define SERVER_PORT 8080 // for 
+#define SERVER_PORT 5005 // UDP
 #define CHUNK       1024   
 
 static const char* TAG = "camera_httpd";

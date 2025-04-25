@@ -11,6 +11,7 @@
 
 #include "esp_camera.h"
 #include "camera_httpd.h"
+#include "coordinate_task.h"
 
 #define CAM_PIN_PWDN    -1
 #define CAM_PIN_RESET   -1
@@ -37,7 +38,7 @@ static const char *TAG = "camera_app";
 // #define WIFI_PASS "preepree"
 
 // #define WIFI_SSID "BUMRC Members"
-// #define WIFI_PASS ""
+// #define WIFI_PASS "***********" // personal password
 
 #define WIFI_SSID "Group_2/3"
 #define WIFI_PASS "smartsys"
@@ -170,16 +171,15 @@ void app_main(void)
       s->set_vflip(s, 1);
     #endif
 
-    // // 6) optional LED flash setup
-    // #if defined(LED_GPIO_NUM)
-    //   gpio_pad_select_gpio(LED_GPIO_NUM);
-    //   gpio_set_direction(LED_GPIO_NUM, GPIO_MODE_OUTPUT);
-    // #endif
-
-    // start HTTP camera server task
+    // task to send photo via udp/tcp communication
     xTaskCreate(capture_and_send_task, "capture_send", 4096, NULL, 5, NULL);
 
-    //start_camera_server();
+    // Task for running YOLO and coordinate
+    xTaskCreate(coordinate_task, "coordinate_task", 8192, NULL, 5, NULL);
+
+    // start HTTP camera server 
+    // xTaskCreate(start_camera_server, "real-time_camera", 4096, NULL, 5, NULL);
+
     // Delay a bit to ensure Wi-Fi connection is ready
     vTaskDelay(pdMS_TO_TICKS(3000));
 
