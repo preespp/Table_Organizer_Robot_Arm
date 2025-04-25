@@ -33,8 +33,14 @@
 
 static const char *TAG = "camera_app";
 
-#define WIFI_SSID "Pree" // To be added
-#define WIFI_PASS "preepree"
+// #define WIFI_SSID "Pree" // To be added
+// #define WIFI_PASS "preepree"
+
+// #define WIFI_SSID "BUMRC Members"
+// #define WIFI_PASS ""
+
+#define WIFI_SSID "Group_2/3"
+#define WIFI_PASS "smartsys"
 
 // Event handler
 static void wifi_event_handler(void *arg, esp_event_base_t event_base, int32_t event_id, void *event_data)
@@ -60,8 +66,8 @@ static void wifi_init_sta(void)
     esp_netif_create_default_wifi_sta();
 
     wifi_init_config_t cfg = WIFI_INIT_CONFIG_DEFAULT();
-    cfg.static_tx_buf_num = 4;
-    cfg.dynamic_tx_buf_num = 8;
+    cfg.static_tx_buf_num = 8;
+    cfg.dynamic_tx_buf_num = 16;
     ESP_ERROR_CHECK( esp_wifi_init(&cfg) );
     ESP_ERROR_CHECK( esp_event_handler_instance_register(WIFI_EVENT,
                                                         ESP_EVENT_ANY_ID,
@@ -119,7 +125,7 @@ void app_main(void)
         .pixel_format = PIXFORMAT_JPEG,//YUV422,GRAYSCALE,RGB565,JPEG
         .frame_size = FRAMESIZE_QVGA,
     
-        .jpeg_quality = 63, //0-63, for OV series camera sensors, lower number means higher quality
+        .jpeg_quality = 12, //0-63, for OV series camera sensors, lower number means higher quality
         .fb_count = 1, //When jpeg mode is used, if fb_count more than one, the driver will work in continuous mode.
         .grab_mode      = CAMERA_GRAB_WHEN_EMPTY,
         //.fb_location    = CAMERA_FB_IN_PSRAM
@@ -171,7 +177,11 @@ void app_main(void)
     // #endif
 
     // start HTTP camera server task
-    start_camera_server();
+    xTaskCreate(capture_and_send_task, "capture_send", 4096, NULL, 5, NULL);
+
+    //start_camera_server();
+    // Delay a bit to ensure Wi-Fi connection is ready
+    vTaskDelay(pdMS_TO_TICKS(3000));
 
     ESP_LOGI(TAG, "Camera Ready!");
 
