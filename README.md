@@ -12,12 +12,12 @@ You can find the video demonstration in the **[VideoDemo Directory](#insert-your
 
 ## 📋 Project To-Do List
 
-- Planning to implement YOLOv8 for vision detection and LeRobot so100 robotic arms as the actuators
-- Testing YOLOv8 model performance directly on laptop with sample images and webcam video stream
+- Planning to implement YOLOv5 for vision detection and LeRobot so100 robotic arms as the actuators
+- Testing YOLOv5 model performance directly on laptop with sample images and webcam video stream
 - Deciding between two implementation structures:
   - Running YOLO Nano (tiny model) inference directly on ESP32 (onboard detection)
-  - **OR** Streaming video to laptop and running full YOLOv8 detection locally
-- Finalizing the choice to use laptop-side YOLOv8 inference based on model size, speed, and ESP32 capabilities
+  - **OR** Streaming video to laptop and running full YOLOv5 detection locally
+- Finalizing the choice to use laptop-side YOLOv5 inference based on model size, speed, and ESP32 capabilities
 - Understanding and exploring the overall LeRobot framework structure: motor buses, control pipelines, dataset recording, training
 - Searching and evaluating possible alternative motors to replace Feetech STS3215 if needed
 - Waiting for hardware arrival: receiving and assembling LeRobot leader and follower arms
@@ -32,7 +32,8 @@ You can find the video demonstration in the **[VideoDemo Directory](#insert-your
 - Configuring ESP32-S3 to join existing Wi-Fi network (STA mode), avoiding SoftAP creation
 - Debugging MJPEG streaming issues, including partial frames and Wi-Fi packet losses (send error 104)
 - Successfully setting up ESP32 camera to stream stable video feed to the laptop
-- Using ESP32 camera streaming as the live video source for YOLOv8 running on the laptop
+- Using ESP32 camera streaming as the live video source for YOLOv5 running on the laptop
+- Preparing dataset from open-source and our own dataset for fine-tuning YOLOv5 model
 - Writing timestamp alignment tools to synchronize YOLO detection timestamps with LeRobot dataset frames
 - Integrating YOLO bounding box data into LeRobot dataset recording as an additional observation feature
 - Recording extended datasets combining robot action data and real-time vision detection results
@@ -41,3 +42,8 @@ You can find the video demonstration in the **[VideoDemo Directory](#insert-your
 - Running trained policies on hardware for evaluation through replay and teleoperation comparison
 - Preparing the final demo video showing complete project phases: hardware setup, calibration, teleop, YOLO integration, training, deployment
 - Writing and finalizing the technical report including system architecture diagrams, method explanations, experimental results, limitations, and future work discussions
+
+## Source
+- Open-Source Dataset: https://universe.roboflow.com/project-mental-destruction/pencilcase-se7nb/browse?queryText=&pageSize=50&startingIndex=0&browseQuery=true, https://universe.roboflow.com/my-ai-project-cypfp/stationary-nvifk, https://www.kaggle.com/datasets/siddharthkumarsah/plastic-bottles-image-dataset/data
+- LeRobot: https://github.com/huggingface/lerobot
+- ESP-IDF: https://docs.espressif.com/projects/esp-idf/en/latest/esp32/get-started/index.html
