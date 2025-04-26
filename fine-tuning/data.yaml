@@ -1,0 +1,5 @@
+train: ./fine-tuning/dataset/train
+val: ./fine-tuning/dataset/valid
+
+nc: 3
+names: ['bottle', 'eraser', 'pencilcase']

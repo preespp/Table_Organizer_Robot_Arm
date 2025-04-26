@@ -12,7 +12,7 @@ def main():
                 print("Current Positions:", data["current"])
         except FileNotFoundError:
             print("Waiting for data...")
-        
+    
         time.sleep(1)
 
 if __name__ == "__main__":
