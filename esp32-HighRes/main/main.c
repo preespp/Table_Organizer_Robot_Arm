@@ -18,7 +18,7 @@
  #include "driver/gpio.h"
  #include "esp_psram.h"              /* ★ used for automatic PSRAM detection */
  
- #define WIFI_SSID  "Group_2"
+ #define WIFI_SSID  "Group_2/3"
  #define WIFI_PASS  "smartsys"
  #define MAX_RETRY  5
  

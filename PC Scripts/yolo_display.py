@@ -7,13 +7,18 @@ import json
 def main():
     # Load YOLOv8n model
     model = YOLO("yolov5n.pt")
-    model = YOLO("fine-tuning/fine_tuned_yolov5n/weights/best.pt")
+    # model = YOLO("fine-tuning/fine_tuned_yolov5n/weights/best.pt")
+
+    server_ip = "http://192.168.8.170"
 
     original_positions = {}  # {class_id: (center_x, center_y)}
     current_positions = {}   # {class_id: (center_x, center_y)}
 
     # Open video stream (webcam or ESP32)
-    cap = cv2.VideoCapture(0)  # Replace with ESP32 stream URL if needed
+    #cap = cv2.VideoCapture(0)  # Replace with ESP32 stream URL if needed
+
+    # For reading image from web server
+    cap = cv2.VideoCapture(server_ip)
 
     if not cap.isOpened():
         print("Could not open video stream")
