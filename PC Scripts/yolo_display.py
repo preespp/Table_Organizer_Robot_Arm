@@ -15,9 +15,7 @@ def main():
     current_positions = {}   # {class_id: (center_x, center_y)}
 
     # Open video stream (webcam or ESP32)
-    #cap = cv2.VideoCapture(0)  # Replace with ESP32 stream URL if needed
-
-    # For reading image from web server
+    # cap = cv2.VideoCapture(0)  # Replace with ESP32 stream URL if needed
     cap = cv2.VideoCapture(server_ip)
 
     if not cap.isOpened():
@@ -99,14 +97,34 @@ def main():
             cv2.putText(frame, label, (x1, y1 - 10),
                         cv2.FONT_HERSHEY_SIMPLEX, 0.5, (255, 255, 0), 2)
 
-        # Save to JSON
+        # Save to JSON with full detection info
+        original_json = {}
+        current_json = {}
+
+        for class_id in overlay_boxes:
+            x1, y1, x2, y2 = overlay_boxes[class_id]
+            center_x, center_y = overlay_centers[class_id]
+            label_text, conf = overlay_labels[class_id]
+            width = x2 - x1
+            height = y2 - y1
+
+            entry = [center_x, center_y, width, height, class_id, float(conf)]
+
+            # Save original if exists
+            if class_id in original_positions:
+                orig_cx, orig_cy = original_positions[class_id]
+                original_json[str(class_id)] = [orig_cx, orig_cy, width, height, class_id, float(conf)]
+
+            # Save current
+            current_json[str(class_id)] = entry
+
         data = {
-            "original": {str(k): v for k, v in original_positions.items()},
-            "current": {str(k): v for k, v in current_positions.items()}
+            "original": original_json,
+            "current": current_json
         }
 
         with open("object_positions.json", "w") as f:
-            json.dump(data, f)
+            json.dump(data, f, indent=4)
 
         # Show the video feed with overlays
         cv2.imshow("YOLO with Optical Flow Motion Detection", frame)
