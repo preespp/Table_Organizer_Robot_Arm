@@ -6,8 +6,8 @@ import json
 
 def main():
     # Load YOLOv8n model
-    # model = YOLO("yolov5n.pt")
-    model = YOLO("../fine-tuning/fine-tuning/fine_tuned_yolov5n/weights/best.pt")
+    model = YOLO("yolov8n.pt")
+    # model = YOLO("../fine-tuning/fine-tuning/fine_tuned_yolov5n/weights/best.pt")
 
     server_ip = "http://192.168.8.170"
 
@@ -53,7 +53,7 @@ def main():
         prev_gray = gray  # Update for next iteration
 
         if motion_detected:
-            results = model(frame)
+            results = model(frame, classes=[39, 65, 76])
             boxes = results[0].boxes.xyxy.cpu().numpy()
             confidences = results[0].boxes.conf.cpu().numpy()
             class_ids = results[0].boxes.cls.cpu().numpy().astype(int)
@@ -105,15 +105,17 @@ def main():
             x1, y1, x2, y2 = overlay_boxes[class_id]
             center_x, center_y = overlay_centers[class_id]
             label_text, conf = overlay_labels[class_id]
-            width = x2 - x1
-            height = y2 - y1
+            width = int(x2 - x1)
+            height = int(y2 - y1)
 
-            entry = [center_x, center_y, width, height, class_id, float(conf)]
+            entry = [int(center_x), int(center_y), width, height, int(class_id), float(conf)]
 
             # Save original if exists
             if class_id in original_positions:
                 orig_cx, orig_cy = original_positions[class_id]
-                original_json[str(class_id)] = [orig_cx, orig_cy, width, height, class_id, float(conf)]
+                original_json[str(class_id)] = [
+                    int(orig_cx), int(orig_cy), width, height, int(class_id), float(conf)
+                ]
 
             # Save current
             current_json[str(class_id)] = entry
