@@ -9,14 +9,15 @@ from datetime import datetime
 def main():
     # Load YOLOv8n model
     model = YOLO("yolov8n.pt")
+    # model = YOLO("../fine-tuning/fine-tuning/fine_tuned_yolov5n/weights/best.pt")
 
     server_ip = "http://192.168.8.170"
 
     original_positions = {}  # {class_id: (center_x, center_y)}
     current_positions = {}   # {class_id: (center_x, center_y)}
-    previous_centers = {}    # {class_id: (center_x, center_y)} for tracking movement
 
     # Open video stream (webcam or ESP32)
+    # cap = cv2.VideoCapture(0)  # Replace with ESP32 stream URL if needed
     cap = cv2.VideoCapture(server_ip)
 
     if not cap.isOpened():
@@ -43,10 +44,10 @@ def main():
             class_ids = results[0].boxes.cls.cpu().numpy().astype(int)
             names = results[0].names  # Class names
 
-            # Temporary storage for new overlays
-            new_overlay_centers = {}
-            new_overlay_boxes = {}
-            new_overlay_labels = {}
+            # Reset overlay storage
+            overlay_centers.clear()
+            overlay_boxes.clear()
+            overlay_labels.clear()
 
             for box, conf, class_id in zip(boxes, confidences, class_ids):
                 x1, y1, x2, y2 = box.astype(int)
@@ -61,28 +62,10 @@ def main():
                 # Update current positions
                 current_positions[class_id] = (center_x, center_y)
 
-                # Check movement (compared to previous centers)
-                if class_id not in previous_centers:
-                    # First-time detection: always draw
-                    new_overlay_centers[class_id] = (center_x, center_y)
-                    new_overlay_boxes[class_id] = (x1, y1, x2, y2)
-                    new_overlay_labels[class_id] = (label_text, conf)
-                else:
-                    prev_cx, prev_cy = previous_centers[class_id]
-                    dx = abs(center_x - prev_cx)
-                    dy = abs(center_y - prev_cy)
-                    if dx >= 2 or dy >= 2:
-                        # Movement exceeds threshold, update overlay
-                        new_overlay_centers[class_id] = (center_x, center_y)
-                        new_overlay_boxes[class_id] = (x1, y1, x2, y2)
-                        new_overlay_labels[class_id] = (label_text, conf)
-                # Update previous centers regardless
-                previous_centers[class_id] = (center_x, center_y)
-
-            # Update overlays only if movement exceeds threshold
-            overlay_centers = new_overlay_centers
-            overlay_boxes = new_overlay_boxes
-            overlay_labels = new_overlay_labels
+                # Store overlay data
+                overlay_centers[class_id] = (center_x, center_y)
+                overlay_boxes[class_id] = (x1, y1, x2, y2)
+                overlay_labels[class_id] = (label_text, conf)
 
             # Draw annotations (from overlays)
             for class_id in overlay_boxes:
@@ -122,8 +105,9 @@ def main():
                 # Save current
                 current_json[str(class_id)] = entry
 
+            timestamp = datetime.now().isoformat()
             data = {
-                "timestamp": datetime.now().isoformat(),
+                "timestamp": timestamp,
                 "original": original_json,
                 "current": current_json
             }
