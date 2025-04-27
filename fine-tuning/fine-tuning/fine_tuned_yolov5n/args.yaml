@@ -10,7 +10,7 @@ imgsz: 640
 save: true
 save_period: -1
 cache: false
-device: null
+device: 0
 workers: 8
 project: fine-tuning
 name: fine_tuned_yolov5n
@@ -101,4 +101,4 @@ auto_augment: randaugment
 erasing: 0.4
 cfg: null
 tracker: botsort.yaml
-save_dir: fine-tuning/fine_tuned_yolov5n
+save_dir: fine-tuning\fine_tuned_yolov5n

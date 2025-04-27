@@ -6,8 +6,8 @@ import json
 
 def main():
     # Load YOLOv8n model
-    model = YOLO("yolov5n.pt")
-    # model = YOLO("fine-tuning/fine_tuned_yolov5n/weights/best.pt")
+    # model = YOLO("yolov5n.pt")
+    model = YOLO("../fine-tuning/fine-tuning/fine_tuned_yolov5n/weights/best.pt")
 
     server_ip = "http://192.168.8.170"
 

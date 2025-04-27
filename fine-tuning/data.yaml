@@ -1,5 +1,5 @@
-train: ./fine-tuning/dataset/train
-val: ./fine-tuning/dataset/valid
+train: C:/Github/Table_Organizer_Robot_Arm/fine-tuning/dataset/train
+val: C:/Github/Table_Organizer_Robot_Arm/fine-tuning/dataset/valid
 
 nc: 3
 names: ['bottle', 'eraser', 'pencilcase']

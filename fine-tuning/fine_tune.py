@@ -1,13 +1,14 @@
 from ultralytics import YOLO
 
-# Load pre-trained model (YOLOv5n or YOLOv8n)
-model = YOLO('yolov5n.pt')
+def main():
+    model = YOLO('yolov5n.pt')
+    model.train(
+        data='data.yaml',
+        epochs=100,
+        imgsz=640,
+        device=0,          # your GTX-1070 (PyTorch index 0)
+        workers=4          # or 0 if you prefer to avoid multiprocessing
+    )
 
-# Fine-tune
-model.train(data='data.yaml',
-            epochs=20,
-            imgsz=640,
-            batch=16,
-            project='fine-tuning',
-            name='fine_tuned_yolov5n',
-            exist_ok=True)
+if __name__ == "__main__":      # ← REQUIRED on Windows when workers>0
+    main()
