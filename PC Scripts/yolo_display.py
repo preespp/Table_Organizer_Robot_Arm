@@ -24,7 +24,7 @@ def main():
 
     # Optical Flow setup
     prev_gray = None
-    motion_threshold = 2.0
+    motion_threshold = 1.0
     frame_counter = 0
 
     # Overlay storage
