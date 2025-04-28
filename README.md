@@ -1,14 +1,14 @@
-# Table_Organizer_Robot_Arm
+# Augmenting Low-Cost Robotic Arms with YOLO-Based Perception and Vision-Language-Action Policies
 ## 📖 Introduction
 
-In this project, we build an integrated robotic system that combines vision detection and robotic manipulation using the LeRobot framework.  
+In this project, we build an integrated robotic system that combines vision detection and robotic manipulation using the LeRobot framework.
 Our setup includes a XIAO ESP32S3 Sense module for wireless video streaming, a standard laptop webcam, and a UVC arm-mounted camera for multi-view perception.  
 We first tested and deployed YOLOv8 models for object detection on the laptop side, leveraging live video feeds streamed over a local Wi-Fi network.  
 The robotic manipulation is performed using LeRobot so100 arms, assembled from leader and follower units.  
 We trained a Vision-Language-Action (VLA) model and fine-tuned YOLOv8 to operate jointly, enabling the robot to detect, reason, and act in a dynamic environment.  
 To further enhance the VLA model’s generalization capability, we designed and implemented our own control strategies based on real-time YOLO detection results.  
 The complete technical steps, experimental results, and lessons learned are thoroughly discussed in our final report.  
-You can find the video demonstration in the **[VideoDemo Directory](#insert-your-link-here)** or watch it via our **[YouTube Video Link](#insert-your-link-here)**.
+You can find the video demonstration in the **VideoDemo Directory** or watch it via our **[YouTube Video Link]()**.
 
 ## 📋 Project To-Do List
 
@@ -43,9 +43,53 @@ You can find the video demonstration in the **[VideoDemo Directory](#insert-your
 - Preparing the final demo video showing complete project phases: hardware setup, calibration, teleop, YOLO integration, training, deployment
 - Writing and finalizing the technical report including system architecture diagrams, method explanations, experimental results, limitations, and future work discussions
 
+<p align='center'>
+<img src="">Our SetUp</img>
+<img src="Images/System_Architecture_Diagram.png">System Architecture Design</img>
+</p>
+
 ## Project Structure
 
-
+```graphql
+.
+├── esp32-HighRes/                        # ESP32-S3 firmware project for camera streaming and YOLO inference
+│   ├── main/                             # Main application source code for ESP32 firmware
+│   │   ├── CMakeLists.txt                # Build system configuration for compiling main application
+│   │   ├── idf_component.yml             # ESP-IDF component metadata (dependencies, versioning)
+│   │   └── main.c                        # Core firmware logic: camera initialization, streaming, inference coordination
+│   ├── managed_components/espressif__esp32-camera/  # ESP32 camera driver component (library for camera support)
+│   ├── CMakeLists.txt                    # Top-level build configuration for the entire firmware project
+│   ├── dependencie.lock                  # Dependency lock file ensuring consistent ESP-IDF component versions
+│   └── sdkconfig                         # ESP-IDF project configuration (camera settings, Wi-Fi, etc.)
+├── fine-tuning/                          # Folder for fine-tuning YOLO models
+│   ├── dataset/                          # Dataset directory for fine-tuning
+│   │   ├── train/                        # Training dataset (images and labels)
+│   │   └── valid/                        # Validation dataset (images and labels)
+│   ├── fine-tuning/fine_tuned_yolov5n/   # Output directory for storing fine-tuned YOLOv5n model results
+│   ├── runs/                             # YOLO training output (logs, checkpoints, metrics)
+│   ├── data.yaml                         # Dataset configuration for YOLO training (paths, class names)
+│   ├── fine_tune.py                      # Script to fine-tune YOLO models using Ultralytics API
+│   ├── yolo11n.pt                        # Pre-trained YOLOv11 Nano model (optional/custom model)
+│   ├── yolov5nu.pt                       # YOLOv5 Nano model (used for fine-tuning)
+│   └── yolov8n.pt                        # YOLOv8 Nano model (used for detection/testing)
+├── Images/                               # Photos used in README or reports (e.g., diagrams, sample outputs)
+├── LeRobot/                              # LeRobot framework for robotic arm control and data processing
+├── Other Scripts/                        # Utility scripts for data preprocessing, testing, and analysis
+│   ├── file_manage.py                    # Script for cleaning and managing dataset files
+│   ├── label_script.py                   # Script for updating class IDs in YOLO label files
+│   ├── main_coord.py                     # Script for testing camera feed, YOLO detection, and center coordinate calculation
+│   ├── random_script.py                  # Script for reading class orders from YOLO models (e.g., COCO class list)
+│   └── tcp_udp_photo.py                  # Script for testing photo transmission via TCP/UDP protocols
+├── PC Scripts/                           # Scripts running on the PC side for processing and control
+│   ├── passing_data.py                   # Script for testing data reading from JSON output by YOLO
+│   ├── yolo_display_flow.py              # YOLO detection with energy-saving logic (runs YOLO only on motion)
+│   ├── yolo_display.py                   # Main script for displaying video feed with YOLO detection and sending data to LeRobot
+│   └── yolov8n.pt                        # YOLOv8 Nano model used for inference on the PC side
+├── Report_VideoDemo/                     # Directory for formal reports and video demonstrations
+├── .gitignore                            # Specifies files and directories to be ignored by Git version control
+├── LICENSE                               # Licensing information for the project
+└── README.md                             # Main project documentation (setup instructions, usage, architecture)
+```
 
 ## Dependencies Setup
 
