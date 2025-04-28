@@ -8,7 +8,7 @@ The robotic manipulation is performed using LeRobot so100 arms, assembled from l
 We trained a Vision-Language-Action (VLA) model and fine-tuned YOLOv8 to operate jointly, enabling the robot to detect, reason, and act in a dynamic environment.  
 To further enhance the VLA model’s generalization capability, we designed and implemented our own control strategies based on real-time YOLO detection results.  
 The complete technical steps, experimental results, and lessons learned are thoroughly discussed in our final report.  
-You can find the video demonstration in the **VideoDemo Directory** or watch it via our **[YouTube Video Link]()**.
+You can find the video demonstration in the **Report_VideoDemo Directory** or watch it via our **[YouTube Video Link]()**.
 
 ## 📋 Project To-Do List
 
@@ -52,6 +52,20 @@ You can find the video demonstration in the **VideoDemo Directory** or watch it 
 
 ```graphql
 .
+├── Images/                               # Photos used in README or reports (e.g., diagrams, sample outputs)
+├── LeRobot/                              # LeRobot framework for robotic arm control and data processing
+├── Other Scripts/                        # Utility scripts for data preprocessing, testing, and analysis
+│   ├── file_manage.py                    # Script for cleaning and managing dataset files
+│   ├── label_script.py                   # Script for updating class IDs in YOLO label files
+│   ├── main_coord.py                     # Script for testing camera feed, YOLO detection, and center coordinate calculation
+│   ├── random_script.py                  # Script for reading class orders from YOLO models (e.g., COCO class list)
+│   └── tcp_udp_photo.py                  # Script for testing photo transmission via TCP/UDP protocols
+├── PC Scripts/                           # Scripts running on the PC side for processing and control
+│   ├── passing_data.py                   # Script for testing data reading from JSON output by YOLO
+│   ├── yolo_display_flow.py              # YOLO detection with energy-saving logic (runs YOLO only on motion)
+│   ├── yolo_display.py                   # Main script for displaying video feed with YOLO detection and sending data to LeRobot
+│   └── yolov8n.pt                        # YOLOv8 Nano model used for inference on the PC side
+├── Report_VideoDemo/                     # Directory for formal reports and video demonstrations
 ├── esp32-HighRes/                        # ESP32-S3 firmware project for camera streaming and YOLO inference
 │   ├── main/                             # Main application source code for ESP32 firmware
 │   │   ├── CMakeLists.txt                # Build system configuration for compiling main application
@@ -72,20 +86,6 @@ You can find the video demonstration in the **VideoDemo Directory** or watch it 
 │   ├── yolo11n.pt                        # Pre-trained YOLOv11 Nano model (optional/custom model)
 │   ├── yolov5nu.pt                       # YOLOv5 Nano model (used for fine-tuning)
 │   └── yolov8n.pt                        # YOLOv8 Nano model (used for detection/testing)
-├── Images/                               # Photos used in README or reports (e.g., diagrams, sample outputs)
-├── LeRobot/                              # LeRobot framework for robotic arm control and data processing
-├── Other Scripts/                        # Utility scripts for data preprocessing, testing, and analysis
-│   ├── file_manage.py                    # Script for cleaning and managing dataset files
-│   ├── label_script.py                   # Script for updating class IDs in YOLO label files
-│   ├── main_coord.py                     # Script for testing camera feed, YOLO detection, and center coordinate calculation
-│   ├── random_script.py                  # Script for reading class orders from YOLO models (e.g., COCO class list)
-│   └── tcp_udp_photo.py                  # Script for testing photo transmission via TCP/UDP protocols
-├── PC Scripts/                           # Scripts running on the PC side for processing and control
-│   ├── passing_data.py                   # Script for testing data reading from JSON output by YOLO
-│   ├── yolo_display_flow.py              # YOLO detection with energy-saving logic (runs YOLO only on motion)
-│   ├── yolo_display.py                   # Main script for displaying video feed with YOLO detection and sending data to LeRobot
-│   └── yolov8n.pt                        # YOLOv8 Nano model used for inference on the PC side
-├── Report_VideoDemo/                     # Directory for formal reports and video demonstrations
 ├── .gitignore                            # Specifies files and directories to be ignored by Git version control
 ├── LICENSE                               # Licensing information for the project
 └── README.md                             # Main project documentation (setup instructions, usage, architecture)
