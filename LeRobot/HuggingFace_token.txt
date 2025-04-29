@@ -1,0 +1,27 @@
+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
+huggingface-cli login --token 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 --add-to-git-credential
+
+python lerobot/scripts/control_robot.py `
+>>   --robot.type=so100 `
+>>   --control.type=record `
+>>   --control.fps=30 `
+>>   --control.single_task="Grasp a cube and drop it." `
+>>   --control.repo_id=StarLionJiang/so100_pick_cube `
+>>   --control.warmup_time_s=5 `
+>>   --control.episode_time_s=30 `
+>>   --control.reset_time_s=30 `
+>>   --control.num_episodes=2 `
+>>   --control.push_to_hub=true `
+>>   --control.play_sounds=false `
+>>
+
+$env:PATH = "C:\ffmpeg\bin;" + $env:PATH
+ffmpeg -hide_banner -encoders | sls svt
+
+python lerobot/scripts/control_robot.py `
+  --robot.type=so100 `
+  --control.type=replay `
+  --control.fps=30 `
+  --control.repo_id=StarLionJiang/so100_pick_cube `
+  --control.episode=0
+  --control.play_sounds=false `
