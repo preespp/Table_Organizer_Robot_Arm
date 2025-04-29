@@ -43,11 +43,16 @@ You can find the video demonstration in the **[Report_VideoDemo Directory](https
 - Preparing the final demo video showing complete project phases: hardware setup, calibration, teleop, YOLO integration, training, deployment
 - Writing and finalizing the technical report including system architecture diagrams, method explanations, experimental results, limitations, and future work discussions
 
-<p align='center'>
-<img src="Images/Setup.JPG">Our SetUp</img> 
-<img src="Images/esp32_mount.JPG">ESP32 Mount</img> 
-<img src="Images/CAD.png">Assembly in CAD</img>
-<img src="Images/System_Architecture_Diagram.png">System Architecture Design</img>
+<p align="center">
+  <img src="Images/Setup.JPG" alt="Our Setup" height="300px">
+  
+  <img src="Images/esp32_mount.JPG" alt="ESP32 Mount" height="300px">
+  <img src="Images/CAD.png" alt="Assembly in CAD" height="300px">
+  <p align="center"> Setup + ESP32 Mount + Assembly of Mount in CAD</p>
+</p>
+<p align="center">
+  <img src="Images/System_Architecture_Diagram.png" alt="System Architecture Design" height="500px">
+  <p align="center">System Architecture Design</p>
 </p>
 
 ## Project Structure
