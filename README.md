@@ -44,7 +44,9 @@ You can find the video demonstration in the **[Report_VideoDemo Directory](https
 - Writing and finalizing the technical report including system architecture diagrams, method explanations, experimental results, limitations, and future work discussions
 
 <p align='center'>
-<img src="Images/Setup.JPG">Our SetUp</img>
+<img src="Images/Setup.JPG">Our SetUp</img> 
+<img src="Images/esp32_mount.JPG">ESP32 Mount</img> 
+<img src="Images/CAD.png">Assembly in CAD</img>
 <img src="Images/System_Architecture_Diagram.png">System Architecture Design</img>
 </p>
 
