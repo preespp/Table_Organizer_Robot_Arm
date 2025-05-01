@@ -8,7 +8,7 @@ The robotic manipulation is performed using LeRobot so100 arms, assembled from l
 We trained a Vision-Language-Action (VLA) model and fine-tuned YOLOv8 to operate jointly, enabling the robot to detect, reason, and act in a dynamic environment.  
 To further enhance the VLA model’s generalization capability, we designed and implemented our own control strategies based on real-time YOLO detection results.  
 The complete technical steps, experimental results, and lessons learned are thoroughly discussed in our final report.  
-You can find the video demonstration in the **[Report_VideoDemo Directory](https://github.com/preespp/Table_Organizer_Robot_Arm/tree/main/Report_VideoDemo)** or watch it via our **[YouTube Video Link]()**.
+You can find the video demonstration in the **[Report_VideoDemo Directory](https://github.com/preespp/augment-robot-arm-yolo-vla/tree/main/Report_VideoDemo)** or watch it via our **[YouTube Video Link]()**.
 
 ## 📋 Project To-Do List
 
