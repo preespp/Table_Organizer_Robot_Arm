@@ -164,6 +164,8 @@ This script will receive the video stream from the ESP32-S3 and run YOLO inferen
 - Our Script in LeRobot folder is modified to synthesize with YOLO data passed from yolo_display.py script
 - Make sure to run yolo_display.py in the same directory with control_robot from LeRobot
 
+## Link to Demo Video
+[Project Demo Video](https://youtu.be/-n9ZhXqO-Go)
 ## Source
 - [Open-Source Dataset1](https://universe.roboflow.com/project-mental-destruction/pencilcase-se7nb/browse?queryText=&pageSize=50&startingIndex=0&browseQuery=true) 
 - [Open-Source Dataset2](https://universe.roboflow.com/my-ai-project-cypfp/stationary-nvifk) 
