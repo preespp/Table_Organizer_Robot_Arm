@@ -1,0 +1,29 @@
+robot:
+  type: so100
+  cameras:
+    cam01:
+      type: opencv
+      camera_index: 0
+      fps: 30
+      width: 640
+      height: 480
+    cam02:
+      type: opencv
+      camera_index: 1
+      fps: 30
+      width: 640
+      height: 480
+
+control:
+  type: record
+  single_task: "Grasp a cube and drop it."
+  fps: 30
+  repo_id: local/so100_pick_cube_local           
+  root: C:\LeRobot\data                    
+  warmup_time_s: 5
+  episode_time_s: 30
+  reset_time_s: 30
+  num_episodes: 2
+  push_to_hub: false
+  play_sounds: false
+ 
