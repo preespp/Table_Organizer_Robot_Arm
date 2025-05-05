@@ -8,7 +8,7 @@ The robotic manipulation is performed using LeRobot so100 arms, assembled from l
 We trained a Vision-Language-Action (VLA) model and fine-tuned YOLOv8 to operate jointly, enabling the robot to detect, reason, and act in a dynamic environment.  
 To further enhance the VLA model’s generalization capability, we designed and implemented our own control strategies based on real-time YOLO detection results.  
 The complete technical steps, experimental results, and lessons learned are thoroughly discussed in our final report.  
-You can find the video demonstration in the **[Report_VideoDemo Directory](https://github.com/preespp/augment-robot-arm-yolo-vla/tree/main/Report_VideoDemo)** or watch it via our **[YouTube Video Link]()**.
+You can find the video demonstration in the **[Report_VideoDemo Directory](https://github.com/preespp/augment-robot-arm-yolo-vla/tree/main/Report_VideoDemo)** or watch it via our **[YouTube Video Link](https://www.youtube.com/watch?v=-n9ZhXqO-Go)**.
 
 ## 📋 Project To-Do List
 
@@ -164,8 +164,6 @@ This script will receive the video stream from the ESP32-S3 and run YOLO inferen
 - Our Script in LeRobot folder is modified to synthesize with YOLO data passed from yolo_display.py script
 - Make sure to run yolo_display.py in the same directory with control_robot from LeRobot
 
-## Link to Demo Video
-[Project Demo Video](https://youtu.be/-n9ZhXqO-Go)
 ## Source
 - [Open-Source Dataset1](https://universe.roboflow.com/project-mental-destruction/pencilcase-se7nb/browse?queryText=&pageSize=50&startingIndex=0&browseQuery=true) 
 - [Open-Source Dataset2](https://universe.roboflow.com/my-ai-project-cypfp/stationary-nvifk) 
