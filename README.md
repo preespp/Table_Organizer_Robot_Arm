@@ -8,7 +8,9 @@ The robotic manipulation is performed using LeRobot so100 arms, assembled from l
 We trained a Vision-Language-Action (VLA) model and fine-tuned YOLOv8 to operate jointly, enabling the robot to detect, reason, and act in a dynamic environment.  
 To further enhance the VLA model’s generalization capability, we designed and implemented our own control strategies based on real-time YOLO detection results.  
 The complete technical steps, experimental results, and lessons learned are thoroughly discussed in our final report.  
-You can find the video demonstration in the **[Report_VideoDemo Directory](https://github.com/preespp/augment-robot-arm-yolo-vla/tree/main/Report_VideoDemo)** or watch it via our **[YouTube Video Link]()**.
+You can find the video demonstration in our **[YouTube Video Link](https://www.youtube.com/watch?v=-n9ZhXqO-Go)** or click Setup Photo Below to watch the video.
+
+[![Watch the video](Images/Setup.JPG)](https://youtu.be/-n9ZhXqO-Go?si=msp9_qsxLzO7EP09)
 
 ## 📋 Project To-Do List
 
@@ -43,12 +45,10 @@ You can find the video demonstration in the **[Report_VideoDemo Directory](https
 - Preparing the final demo video showing complete project phases: hardware setup, calibration, teleop, YOLO integration, training, deployment
 - Writing and finalizing the technical report including system architecture diagrams, method explanations, experimental results, limitations, and future work discussions
 
-<p align="center">
-  <img src="Images/Setup.JPG" alt="Our Setup" height="200px">
-  
+<p align="center">  
   <img src="Images/esp32_mount.JPG" alt="ESP32 Mount" height="200px">
   <img src="Images/CAD.png" alt="Assembly in CAD" height="200px">
-  <p align="center"> Setup + ESP32 Mount + Assembly of Mount in CAD</p>
+  <p align="center"> ESP32 Mount + Assembly of Mount in CAD</p>
 </p>
 <p align="center">
   <img src="Images/System_Architecture_Diagram.png" alt="System Architecture Design" height="450px">
@@ -164,8 +164,6 @@ This script will receive the video stream from the ESP32-S3 and run YOLO inferen
 - Our Script in LeRobot folder is modified to synthesize with YOLO data passed from yolo_display.py script
 - Make sure to run yolo_display.py in the same directory with control_robot from LeRobot
 
-## Link to Demo Video
-[Project Demo Video](https://youtu.be/-n9ZhXqO-Go)
 ## Source
 - [Open-Source Dataset1](https://universe.roboflow.com/project-mental-destruction/pencilcase-se7nb/browse?queryText=&pageSize=50&startingIndex=0&browseQuery=true) 
 - [Open-Source Dataset2](https://universe.roboflow.com/my-ai-project-cypfp/stationary-nvifk) 
